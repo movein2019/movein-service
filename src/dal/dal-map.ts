@@ -3,7 +3,7 @@ export class MapDal {
 
   constructor() {
     this.userRoutes = new Map<string, string>();
-    this.userRoutes["u1"] = ["a", "b", "d"];
+    // this.userRoutes["u1"] = ["a", "b", "d"];
   }
 
   public setRouteForUser(userId: string, route: string[]) {
