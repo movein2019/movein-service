@@ -59,13 +59,11 @@
             />
           </div>
           <div v-for="(m,idx) in locations" class="row">
-            <div class="col-md-4">
+            <div class="col-md-6">
+              <button class="" type="button" @click="removeLocation(idx)">
+                x
+              </button>
               <b>{{ m.name }}, {{ m.building }}, room {{ m.room }}</b>
-              <button
-                class=""
-                type="button"
-                @click="removeLocation(idx)"
-              >x</button>
             </div>
 
             <!-- <div class="col-md-2">
@@ -87,10 +85,10 @@
               class="browser-default custom-select col-md-6"
               v-model="selectedLocation"
             >
-              <option value="Building A" selected>Location A</option>
-              <option value="Building B">Location B</option>
-              <option value="Building C">Location C</option>
-              <option value="Building D">Location D</option>
+              <option value="Emergency room" selected>Emergency room</option>
+              <option value="X-Ray Radiology">X-Ray Radiology</option>
+              <option value="Neurology Dept">Neurology Dept</option>
+              <option value="Blood testing">Blood testing</option>
             </select>
             <button
               type="button"
@@ -116,7 +114,7 @@
 
         data: {
           user: "u1",
-          selectedLocation: "Building B",
+          selectedLocation: "Emergency room",
           locations: [
             // {
             //   name: "Radiology Dept.",
@@ -130,7 +128,7 @@
           $.get(
             "http://" + window.location.host + "/v1/route?user=" + self.user,
             function(data) {
-              self.locations = data.locations;
+              self.locations = data.locations || [];
             }
           );
         },
@@ -138,7 +136,7 @@
           switchUser: function(newUser) {
             var self = this;
             this.user = newUser;
-            this.locations=[];
+            this.locations = [];
             $.get(
               "http://" + window.location.host + "/v1/route?user=" + newUser,
               function(data) {
@@ -166,8 +164,8 @@
           addLocation: function(loc) {
             this.locations.push({
               name: loc,
-              building: "St. Lucy campus",
-              room: ""+Math.floor(Math.random() * Math.floor(700))
+              building: "Google Campus",
+              room: "" + Math.floor(Math.random() * Math.floor(700))
             });
             this.changeRoute(this.locations, this.user);
           },
