@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Movin web app</title>
+    <link rel="icon" href="/icons/Network-Remote-Control-icon.png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+      integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <script src="https://unpkg.com/vue"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+        crossorigin="anonymous"></script> -->
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
+      integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+      crossorigin="anonymous"
+    ></script>
+    <br />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script></script>
+
+    <div class="container border border-dark rounded bg-light">
+      <form>
+        <div class="form-group m-3" id="vueApp">
+          <div class="row">
+            <div class="media">
+              <img
+                src="/icons/person-walking.png"
+                class="align-self-end"
+                style="height: 48px;width: 48px;"
+              />
+              <div class="media-body align-self-end">
+                <h2 class="mt-0">Movin Hospital Routing</h2>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <h3>
+              Patient ID:&nbsp;
+            </h3>
+            <input
+              type="text"
+              class="form-control col-md-1"
+              v-on:change="switchUser(user)"
+              id="userNameText"
+              v-model="user"
+            />
+          </div>
+          <div v-for="(m,idx) in locations" class="row">
+            <div class="col-md-4">
+              <b>{{ m.name }}, {{ m.building }}, room {{ m.room }}</b>
+              <button
+                class=""
+                type="button"
+                @click="removeLocation(idx)"
+              >x</button>
+            </div>
+
+            <!-- <div class="col-md-2">
+                        <input type="range" v-on:change="changeVolume(m.volume,m.name)" min="0" max="100" v-model="m.volume" id="volumeSlider"></input>
+                    </div>
+
+                    <div class="col-md-1">
+                        <input type="text" v-on:change="changeVolume(m.volume,m.name)" id="volumeText" v-model="m.volume"></input>
+                    </div> -->
+          </div>
+          <div class="row">
+            New location:&nbsp;
+            <!-- <input
+              type="text"
+              class="form-control col-md-8"
+              v-model="newLocation"
+            /> -->
+            <select
+              class="browser-default custom-select col-md-6"
+              v-model="selectedLocation"
+            >
+              <option value="Building A" selected>Location A</option>
+              <option value="Building B">Location B</option>
+              <option value="Building C">Location C</option>
+              <option value="Building D">Location D</option>
+            </select>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="addLocation(selectedLocation)"
+            >
+              add
+            </button>
+          </div>
+        </div>
+
+        <!-- <div class="row ">
+                <div class="col-md-10">
+                    <h2>output</h2>
+                    <textarea class="form-control rta" id="output"></textarea>
+                </div>
+            </div> -->
+      </form>
+    </div>
+    <script>
+      var appData = new Vue({
+        el: "#vueApp",
+
+        data: {
+          user: "u1",
+          selectedLocation: "Building B",
+          locations: [
+            // {
+            //   name: "Radiology Dept.",
+            //   building: "St. Lucy the fair",
+            //   room: "503"
+            // }
+          ]
+        },
+        mounted: function() {
+          var self = this;
+          $.get(
+            "http://" + window.location.host + "/v1/route?user=" + self.user,
+            function(data) {
+              self.locations = data.locations;
+            }
+          );
+        },
+        methods: {
+          switchUser: function(newUser) {
+            var self = this;
+            this.user = newUser;
+            this.locations=[];
+            $.get(
+              "http://" + window.location.host + "/v1/route?user=" + newUser,
+              function(data) {
+                //  let d = data;
+                self.locations = data.locations || [];
+              }
+            );
+          },
+          changeRoute: function(userRoute, userId) {
+            let url =
+              "http://" + window.location.host + "/v1/route?user=" + userId;
+
+            $.ajax({
+              url: url,
+              data: JSON.stringify({
+                route: userRoute
+              }),
+              dataType: "json",
+              type: "POST",
+              contentType: "application/json",
+              success: response => console.log(response),
+              error: e => console.log(e)
+            });
+          },
+          addLocation: function(loc) {
+            this.locations.push({
+              name: loc,
+              building: "St. Lucy campus",
+              room: ""+Math.floor(Math.random() * Math.floor(700))
+            });
+            this.changeRoute(this.locations, this.user);
+          },
+          removeLocation: function(index) {
+            this.locations.splice(index, 1);
+            this.changeRoute(this.locations, this.user);
+          }
+        }
+      });
+    </script>
+
+    <script type="text/javascript">
+      function refreshVolume() {
+        var xhttp1 = new XMLHttpRequest();
+
+        xhttp1.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            jObj = JSON.parse(this.responseText);
+            document.getElementById("volumeSlider").value = jObj.volume;
+            document.getElementById("volumeText").value = jObj.volume;
+          }
+        };
+        xhttp1.open("GET", "http://" + window.location.host + "/get-volume");
+        xhttp1.send();
+      }
+    </script>
+  </body>
+</html>
