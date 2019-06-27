@@ -9,7 +9,6 @@ COPY ./gulpfile.js .
 COPY ./package.json .
 COPY ./tsconfig.json .
 COPY ./tslint.json .
-COPY ./songs.json .
 COPY ./config.json .
 COPY ./Dockerfile .
 
@@ -29,7 +28,6 @@ WORKDIR /opt/my-musik/
 COPY --from=build-env /opt/my-musik/dist ./dist
 COPY --from=build-env /opt/my-musik/package.json ./
 COPY --from=build-env /opt/my-musik/config.json ./
-COPY --from=build-env /opt/my-musik/songs.json ./
 RUN npm install --no-optional --only=prod
 
 EXPOSE 3000
